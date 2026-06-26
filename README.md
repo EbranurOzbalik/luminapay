@@ -72,13 +72,9 @@ Install the Freighter browser extension and switch it to Stellar Testnet before 
 
 ## Screenshots
 
-### Wallet Connected
+### Wallet Connected and Balance Displayed
 
-![Wallet connected state](screenshots/wallet-connected.png)
-
-### Balance Displayed
-
-![Balance displayed](screenshots/balance-displayed.png)
+![Wallet connected and balance displayed](screenshots/wallet-connected.png)
 
 ### Successful Testnet Transaction
 
