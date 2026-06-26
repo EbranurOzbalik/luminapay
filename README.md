@@ -82,7 +82,7 @@ Install the Freighter browser extension and switch it to Stellar Testnet before 
 
 ### Successful Testnet Transaction
 
-![Successful testnet transaction](screenshots/successful-transaction.png)
+The transaction was signed with Freighter and submitted successfully on Stellar Testnet.
 
 ### Transaction Result
 
