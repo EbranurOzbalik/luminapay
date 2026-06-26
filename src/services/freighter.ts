@@ -1,9 +1,12 @@
 import {
   getAddress,
+  getNetworkDetails,
   isConnected,
   requestAccess,
   signTransaction,
 } from "@stellar/freighter-api";
+
+const TESTNET_PASSPHRASE = "Test SDF Network ; September 2015";
 
 declare global {
   interface Window {
@@ -13,7 +16,20 @@ declare global {
 }
 
 export async function checkFreighterInstalled(): Promise<boolean> {
-  return typeof window !== "undefined" && Boolean(window.freighter || window.freighterApi);
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  if (window.freighter || window.freighterApi) {
+    return true;
+  }
+
+  try {
+    const connectionStatus = await isConnected();
+    return !connectionStatus.error;
+  } catch {
+    return false;
+  }
 }
 
 export async function connectFreighter(): Promise<string> {
@@ -29,16 +45,27 @@ export async function connectFreighter(): Promise<string> {
     if (connected.isConnected) {
       const currentAddress = await getAddress();
 
+      if (currentAddress.error) {
+        throw new Error(getFreighterErrorMessage(currentAddress.error, "Could not read wallet address."));
+      }
+
       if (currentAddress.address) {
+        await assertFreighterTestnet();
         return currentAddress.address;
       }
     }
 
     const access = await requestAccess();
 
+    if (access.error) {
+      throw new Error(getFreighterErrorMessage(access.error, "Wallet access was not approved."));
+    }
+
     if (!access.address) {
       throw new Error("Wallet access was not approved.");
     }
+
+    await assertFreighterTestnet();
 
     return access.address;
   } catch (error) {
@@ -49,7 +76,7 @@ export async function connectFreighter(): Promise<string> {
 export async function signWithFreighter(transactionXdr: string): Promise<string> {
   try {
     const result = await signTransaction(transactionXdr, {
-      networkPassphrase: "Test SDF Network ; September 2015",
+      networkPassphrase: TESTNET_PASSPHRASE,
     });
 
     if (!result.signedTxXdr) {
@@ -62,9 +89,37 @@ export async function signWithFreighter(transactionXdr: string): Promise<string>
   }
 }
 
+async function assertFreighterTestnet(): Promise<void> {
+  const networkDetails = await getNetworkDetails();
+
+  if (networkDetails.error) {
+    throw new Error(getFreighterErrorMessage(networkDetails.error, "Could not read Freighter network."));
+  }
+
+  if (networkDetails.networkPassphrase !== TESTNET_PASSPHRASE) {
+    throw new Error("Freighter must be switched to Stellar Testnet before connecting.");
+  }
+}
+
 function getFreighterErrorMessage(error: unknown, fallback: string): string {
   if (error instanceof Error && error.message) {
     return error.message;
+  }
+
+  if (typeof error === "string") {
+    return error;
+  }
+
+  if (typeof error === "object" && error !== null) {
+    const possibleError = error as { message?: string; error?: string };
+
+    if (possibleError.message) {
+      return possibleError.message;
+    }
+
+    if (possibleError.error) {
+      return possibleError.error;
+    }
   }
 
   return fallback;
