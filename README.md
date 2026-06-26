@@ -74,16 +74,16 @@ Install the Freighter browser extension and switch it to Stellar Testnet before 
 
 ### Wallet Connected
 
-Placeholder for a connected wallet screenshot.
+![Wallet connected state](screenshots/wallet-connected.png)
 
 ### Balance Displayed
 
-Placeholder for a balance screenshot.
+![Balance displayed](screenshots/balance-displayed.png)
 
 ### Successful Testnet Transaction
 
-Placeholder for a successful payment screenshot.
+![Successful testnet transaction](screenshots/successful-transaction.png)
 
 ### Transaction Result
 
-Placeholder for the submitted transaction hash screenshot.
+![Transaction result with hash](screenshots/transaction-result.png)
